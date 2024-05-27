@@ -18,7 +18,7 @@
 motion_scale = Vector2( 0, 0 )
 
 [node name="Sprite" type="Sprite" parent="ParallaxBackground/Far"]
-scale = Vector2( 0.75, 0.75 )
+scale = Vector2( 0.9, 0.9 )
 texture = ExtResource( 1 )
 
 [node name="Medium" type="ParallaxLayer" parent="ParallaxBackground"]
