@@ -9,6 +9,7 @@
 extents = Vector2( 40, 40 )
 
 [node name="Player" type="KinematicBody2D"]
+collision_layer = 3
 script = ExtResource( 2 )
 
 [node name="Body" type="Sprite" parent="."]
@@ -21,6 +22,12 @@ texture = ExtResource( 1 )
 position = Vector2( 70, 0 )
 rotation = 0.680678
 texture = ExtResource( 3 )
+
+[node name="RayCast2D" type="RayCast2D" parent="Hand"]
+rotation = 4.03171
+scale = Vector2( 1, 1 )
+cast_to = Vector2( 0, 5000 )
+collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 1 )

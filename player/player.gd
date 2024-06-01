@@ -5,6 +5,7 @@ class_name Player
 const GRAVITY := 1200
 const WALK_VELOCITY := 500
 const JUMP_VELOCITY := 600
+const SHOT_DURATION := 1.25
 
 var _velocity: Vector2 = Vector2.ZERO
 
@@ -19,7 +20,8 @@ var _input_map: Dictionary = {
 var _current_target_pos: Vector2
 
 var _is_jumping := false
-
+var _is_shooting := false
+var _shot_time := 0.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -31,6 +33,18 @@ func _ready():
 #	pass
 
 func _physics_process(delta):
+	if _input_map["shoot"] and not _is_shooting:
+		_is_shooting = true
+		$Hand/Raycast2D.enabled = true
+		_shot_time = 0.0
+	elif _is_shooting:
+		_shot_time += delta
+	
+	if _shot_time >= SHOT_DURATION:
+		_is_shooting = false
+		$Hand/Raycast2D.enabled = false
+		
+		
 	_velocity.x = 0
 	if _input_map["move_left"]:
 		_velocity.x -= WALK_VELOCITY
@@ -66,6 +80,7 @@ func _unhandled_input(event):
 			_input_map["shoot"] = event.pressed
 	if event is InputEventMouseMotion:
 		_on_mouse_pos_updated(get_global_mouse_position())
+
 
 func _on_mouse_pos_updated(new_global_pos: Vector2) -> void:
 	var dir_to := position.direction_to(new_global_pos)
