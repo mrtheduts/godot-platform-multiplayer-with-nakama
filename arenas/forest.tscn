@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://arenas/backgrounds/forest_far.png" type="Texture" id=1]
 [ext_resource path="res://arenas/backgrounds/forest_without_sky.png" type="Texture" id=2]
@@ -6,9 +6,6 @@
 [ext_resource path="res://player/player.tscn" type="PackedScene" id=4]
 [ext_resource path="res://arenas/decoration/tree.png" type="Texture" id=5]
 [ext_resource path="res://arenas/decoration/bush.png" type="Texture" id=6]
-[ext_resource path="res://player/shapes/red_hand_point.png" type="Texture" id=7]
-[ext_resource path="res://player/shapes/red_body_square.png" type="Texture" id=8]
-[ext_resource path="res://player/faces/face_b.png" type="Texture" id=9]
 
 [node name="Forest" type="Node2D"]
 
@@ -59,23 +56,6 @@ texture = ExtResource( 5 )
 [node name="KinematicBody2D" parent="." instance=ExtResource( 4 )]
 position = Vector2( 176, 298 )
 
-[node name="KinematicBody2D2" parent="." instance=ExtResource( 4 )]
-position = Vector2( -64, 85 )
-
-[node name="Body" parent="KinematicBody2D2" index="0"]
-texture = ExtResource( 8 )
-
-[node name="Face" parent="KinematicBody2D2" index="1"]
-texture = ExtResource( 9 )
-
-[node name="Hand" parent="KinematicBody2D2" index="2"]
-position = Vector2( 62, 19 )
-rotation = 1.31074
-scale = Vector2( 1, 1 )
-texture = ExtResource( 7 )
-
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 32, 104 )
 current = true
-
-[editable path="KinematicBody2D2"]

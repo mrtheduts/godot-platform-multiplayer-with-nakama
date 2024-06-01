@@ -2,9 +2,9 @@ extends KinematicBody2D
 
 class_name Player
 
-const GRAVITY := 100
+const GRAVITY := 1200
 const WALK_VELOCITY := 500
-const JUMP_VELOCITY := 500
+const JUMP_VELOCITY := 600
 
 var _velocity: Vector2 = Vector2.ZERO
 
@@ -19,10 +19,6 @@ var _input_map: Dictionary = {
 var _current_target_pos: Vector2
 
 var _is_jumping := false
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
 
 
 # Called when the node enters the scene tree for the first time.
@@ -41,14 +37,19 @@ func _physics_process(delta):
 	if _input_map["move_right"]:
 		_velocity.x += WALK_VELOCITY
 	
-	_velocity = move_and_slide(_velocity)
+	_velocity = move_and_slide(_velocity, Vector2.UP)
+	if abs(_velocity.x) > 0 or abs(_velocity.y) > 0:
+		_on_mouse_pos_updated(get_global_mouse_position())
 	
 	if not is_on_floor():
 		_velocity.y += delta * GRAVITY
 	elif is_on_floor() and _input_map["jump"]:
 		_velocity.y = -JUMP_VELOCITY
+		_is_jumping = true
 	else:
 		_velocity.y = 0
+		_is_jumping = false
+
 
 func _unhandled_input(event):
 	if event is InputEventKey:
@@ -64,4 +65,21 @@ func _unhandled_input(event):
 		if event.button_index == 0:
 			_input_map["shoot"] = event.pressed
 	if event is InputEventMouseMotion:
-		_current_target_pos = get_global_mouse_position()
+		_on_mouse_pos_updated(get_global_mouse_position())
+
+func _on_mouse_pos_updated(new_global_pos: Vector2) -> void:
+	var dir_to := position.direction_to(new_global_pos)
+	var hand_pos: Vector2 = dir_to * 70
+	$Hand.position = hand_pos
+	
+	var offset_angle = 39
+	if hand_pos.x < 0:
+		$Hand.scale.x = -1
+		offset_angle = 180 - 39
+	else:
+		$Hand.scale.x = 1
+	
+	var hand_angle = dir_to.angle() + deg2rad(offset_angle)
+	$Hand.rotation = hand_angle
+	
+	
