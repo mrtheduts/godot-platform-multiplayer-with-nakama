@@ -4,6 +4,11 @@ class_name Player
 
 onready var BULLET_TEXTURE: Texture = load("res://player/particles/trace_01.png")
 
+onready var FACE_TEXTURES: Dictionary = {
+	"normal": load("res://player/faces/face_a.png"),
+	"dead": load("res://player/faces/face_j.png"),
+}
+
 onready var MUZZLE_TEXTURES: Array = [
 	load("res://player/particles/muzzle_01.png"),
 	load("res://player/particles/muzzle_02.png"),
@@ -52,7 +57,7 @@ func _physics_process(delta):
 		_start_shooting()
 	elif _is_shooting:
 		_shot_time += delta
-	
+		_detect_target_hit()
 	if _shot_time >= SHOT_DURATION:
 		_stop_shooting()
 		
@@ -80,6 +85,7 @@ func _start_shooting() -> void:
 	_is_shooting = true
 	$Hand/RayCast2D.enabled = true
 	_shot_time = 0.0
+	
 	var index = rand_range(1, 5) as int
 	$Hand/Light2D.texture = MUZZLE_TEXTURES[index]
 	$Hand/Light2D.enabled = true
@@ -87,25 +93,56 @@ func _start_shooting() -> void:
 	var bullet := Sprite.new()
 	bullet.texture = BULLET_TEXTURE
 	bullet.scale = Vector2(0.5, 0.5)
+	bullet.modulate.a = 0.5
 	
 	var offset_angle = 48
+	var is_hand_mirrored := false
 	if $Hand.scale.x == -1:
 		offset_angle = 180 - offset_angle
+		is_hand_mirrored = true
 	
 	bullet.rotation = $Hand.rotation + deg2rad(offset_angle)
-	print(bullet.rotation_degrees)
 	get_parent().add_child(bullet)
 	bullet.position = position + $Hand.position
+	
+	var bullet_dir := Vector2.UP * BULLET_VELOCITY
+	if is_hand_mirrored:
+		bullet_dir = bullet_dir.rotated(bullet.rotation + deg2rad(180))
+	else:
+		bullet_dir = bullet_dir.rotated(bullet.rotation)
 	
 	var tween := get_tree().create_tween()
 	tween.tween_property(
 		bullet,
 		"position", 
-		bullet.position + (Vector2.ONE * BULLET_VELOCITY * SHOT_DURATION),
+		bullet.position + (bullet_dir  * SHOT_DURATION),
 		SHOT_DURATION
 	)
 	tween.tween_callback(self, "free_bullet", [bullet])
 
+
+func _detect_target_hit() -> void:
+	$Hand/RayCast2D.force_raycast_update()
+	if not $Hand/RayCast2D.is_colliding():
+		return
+	
+	var target = $Hand/RayCast2D.get_collider() as Player
+	if target != null:
+		target.get_hit()
+	
+	_stop_shooting()
+
+
+func get_hit() -> void:
+	$Body/Face.texture = FACE_TEXTURES["dead"]
+	$Body/HitParticle.emitting = true
+	var tween := get_tree().create_tween()
+	tween.tween_property(self, "modulate", Color.transparent, 0.5)
+	tween.tween_callback(self, "_die")
+
+
+func _die() -> void:
+	queue_free()
 
 func _free_bullet(bullet: Node2D) -> void:
 	if bullet != null:
@@ -116,7 +153,7 @@ func _stop_shooting() -> void:
 	_is_shooting = false
 	$Hand/RayCast2D.enabled = false
 	$Hand/Light2D.enabled = false
-	
+
 
 func _unhandled_input(event):
 	if not is_player:
