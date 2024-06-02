@@ -2,10 +2,15 @@ extends KinematicBody2D
 
 class_name Player
 
+signal died
+
 onready var BULLET_TEXTURE: Texture = load("res://player/particles/trace_01.png")
 
 onready var FACE_TEXTURES: Dictionary = {
 	"normal": load("res://player/faces/face_a.png"),
+	"jumping": load("res://player/faces/face_d.png"),
+	"shooting": load("res://player/faces/face_g.png"),
+	"happy_angry": load("res://player/faces/face_f.png"),
 	"dead": load("res://player/faces/face_j.png"),
 }
 
@@ -74,9 +79,12 @@ func _physics_process(delta):
 	if not is_on_floor():
 		_velocity.y += delta * GRAVITY
 	elif is_on_floor() and _input_map["jump"]:
+		_change_face_to("jumping")
 		_velocity.y = -JUMP_VELOCITY
 		_is_jumping = true
 	else:
+		if _is_jumping:
+			_change_face_to("normal")
 		_velocity.y = 0
 		_is_jumping = false
 
@@ -123,14 +131,20 @@ func _start_shooting() -> void:
 
 func _detect_target_hit() -> void:
 	$Hand/RayCast2D.force_raycast_update()
-	if not $Hand/RayCast2D.is_colliding():
-		return
+	if $Hand/RayCast2D.is_colliding():
+		var target = $Hand/RayCast2D.get_collider() as Player
+		_stop_shooting()
+		
+		if target != null:
+			target.get_hit()
+			_change_face_to("happy_angry")
+	else:
+		_change_face_to("shooting")
+		
+	var tween := get_tree().create_tween()
+	tween.tween_interval(1.0)
+	tween.tween_callback(self, "_change_face_to", ["normal"])
 	
-	var target = $Hand/RayCast2D.get_collider() as Player
-	if target != null:
-		target.get_hit()
-	
-	_stop_shooting()
 
 
 func get_hit() -> void:
@@ -139,6 +153,10 @@ func get_hit() -> void:
 	var tween := get_tree().create_tween()
 	tween.tween_property(self, "modulate", Color.transparent, 0.5)
 	tween.tween_callback(self, "_die")
+
+
+func _change_face_to(name: String) -> void:
+	$Body/Face.texture = FACE_TEXTURES[name]
 
 
 func _die() -> void:
