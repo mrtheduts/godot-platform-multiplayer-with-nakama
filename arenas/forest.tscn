@@ -53,8 +53,12 @@ position = Vector2( 7, 146 )
 z_index = -1
 texture = ExtResource( 5 )
 
-[node name="KinematicBody2D" parent="." instance=ExtResource( 4 )]
+[node name="Player 1" parent="." instance=ExtResource( 4 )]
 position = Vector2( 176, 298 )
+is_player = true
+
+[node name="Player 2" parent="." instance=ExtResource( 4 )]
+position = Vector2( -94, 85 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 32, 104 )
