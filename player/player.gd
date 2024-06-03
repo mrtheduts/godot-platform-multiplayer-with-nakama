@@ -51,6 +51,8 @@ var _shot_time := 0.0
 var _shot_cooldown_time := 0.0
 var _is_on_shot_cooldown := false
 
+var _is_falling := false
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize()
@@ -80,6 +82,11 @@ func _physics_process(delta):
 		_velocity.x -= WALK_VELOCITY
 	if _input_map["move_right"]:
 		_velocity.x += WALK_VELOCITY
+	
+	if _input_map["fall"]:
+		collision_mask = 0b100
+	else:
+		collision_mask = 0b101
 	
 	_velocity = move_and_slide(_velocity, Vector2.UP)
 	if abs(_velocity.x) > 0 or abs(_velocity.y) > 0:
