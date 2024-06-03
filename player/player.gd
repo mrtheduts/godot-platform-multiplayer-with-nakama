@@ -27,7 +27,8 @@ const GRAVITY := 1200
 const WALK_VELOCITY := 500
 const JUMP_VELOCITY := 600
 const BULLET_VELOCITY := 8000
-const SHOT_DURATION := 0.25
+const SHOT_DURATION := 0.10
+const SHOT_COOLDOWN := 0.25
 
 export var is_player := false
 
@@ -47,25 +48,33 @@ var _is_jumping := false
 var _is_shooting := false
 var _shot_time := 0.0
 
+var _shot_cooldown_time := 0.0
+var _is_on_shot_cooldown := false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize()
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
-
-func _physics_process(delta):
-	if _input_map["shoot"] and not _is_shooting:
+func _process(delta):
+	if _input_map["shoot"] and not _is_shooting and not _is_on_shot_cooldown:
 		_start_shooting()
-	elif _is_shooting:
-		_shot_time += delta
-		_detect_target_hit()
 	if _shot_time >= SHOT_DURATION:
 		_stop_shooting()
-		
+		_is_on_shot_cooldown = true
+	
+	if _is_on_shot_cooldown:
+		_shot_cooldown_time += delta
+		if _shot_cooldown_time >= SHOT_COOLDOWN:
+			_shot_cooldown_time = 0.0
+			_is_on_shot_cooldown = false
+
+
+func _physics_process(delta):
+	if _is_shooting:
+		_shot_time += delta
+		_detect_target_hit()
+
 	_velocity.x = 0
 	if _input_map["move_left"]:
 		_velocity.x -= WALK_VELOCITY
@@ -133,7 +142,7 @@ func _detect_target_hit() -> void:
 	$Hand/RayCast2D.force_raycast_update()
 	if $Hand/RayCast2D.is_colliding():
 		var target = $Hand/RayCast2D.get_collider() as Player
-		_stop_shooting()
+#		_stop_shooting()
 		
 		if target != null:
 			target.get_hit()
@@ -196,7 +205,7 @@ func _unhandled_input(event):
 
 
 func _on_mouse_pos_updated(new_global_pos: Vector2) -> void:
-	if not is_player:
+	if not is_player or _is_shooting:
 		return
 	
 	var dir_to := position.direction_to(new_global_pos)
