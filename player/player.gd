@@ -126,7 +126,7 @@ func _start_shooting() -> void:
 		bullet.position + (bullet_dir  * SHOT_DURATION),
 		SHOT_DURATION
 	)
-	tween.tween_callback(self, "free_bullet", [bullet])
+	tween.tween_callback(self, "_free_bullet", [bullet])
 
 
 func _detect_target_hit() -> void:
@@ -160,7 +160,9 @@ func _change_face_to(name: String) -> void:
 
 
 func _die() -> void:
+	emit_signal("died", is_player)
 	queue_free()
+
 
 func _free_bullet(bullet: Node2D) -> void:
 	if bullet != null:
