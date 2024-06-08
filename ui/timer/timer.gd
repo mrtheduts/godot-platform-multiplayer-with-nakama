@@ -13,6 +13,7 @@ func _ready():
 	start()
 	_update()
 
+
 func start() -> void:
 	curr_time = TOTAL_TIME
 	var tween := get_tree().create_tween()

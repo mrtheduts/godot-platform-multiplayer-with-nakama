@@ -9,6 +9,11 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "HBoxContainer",
+"class": "InformationHeader",
+"language": "GDScript",
+"path": "res://ui/information_header/information_header.gd"
+}, {
 "base": "Label",
 "class": "MyTimer",
 "language": "GDScript",
@@ -100,6 +105,7 @@ _global_script_classes=[ {
 "path": "res://ui/score/score.gd"
 } ]
 _global_script_class_icons={
+"InformationHeader": "",
 "MyTimer": "",
 "NakamaAPI": "",
 "NakamaAsyncResult": "",

@@ -1,5 +1,7 @@
 extends HBoxContainer
 
+class_name InformationHeader
+
 signal timer_completed
 
 onready var _score: Score = $Score
