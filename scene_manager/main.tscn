@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://ui/session_window/session_window.tscn" type="PackedScene" id=1]
 [ext_resource path="res://scene_manager/main.gd" type="Script" id=2]
+[ext_resource path="res://ui/result_popup/result_popup.tscn" type="PackedScene" id=3]
 
 [node name="Main" type="Node"]
 script = ExtResource( 2 )
@@ -10,4 +11,7 @@ script = ExtResource( 2 )
 
 [node name="SessionWindow" parent="CanvasLayer" instance=ExtResource( 1 )]
 
+[node name="ResultPopup" parent="CanvasLayer" instance=ExtResource( 3 )]
+
 [connection signal="auth_completed" from="CanvasLayer/SessionWindow" to="." method="_on_SessionWindow_auth_completed"]
+[connection signal="restarted_game" from="CanvasLayer/ResultPopup" to="." method="_on_ResultPopup_restarted_game"]

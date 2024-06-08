@@ -99,10 +99,20 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://player/player.gd"
 }, {
+"base": "ConfirmationDialog",
+"class": "ResultPopup",
+"language": "GDScript",
+"path": "res://ui/result_popup/result_popup.gd"
+}, {
 "base": "Label",
 "class": "Score",
 "language": "GDScript",
 "path": "res://ui/score/score.gd"
+}, {
+"base": "Node2D",
+"class": "SpawnPoints",
+"language": "GDScript",
+"path": "res://arenas/spawn_points/spawn_points.gd"
 } ]
 _global_script_class_icons={
 "InformationHeader": "",
@@ -123,7 +133,9 @@ _global_script_class_icons={
 "NakamaStorageObjectId": "",
 "NakamaWriteStorageObject": "",
 "Player": "",
-"Score": ""
+"ResultPopup": "",
+"Score": "",
+"SpawnPoints": ""
 }
 
 [application]

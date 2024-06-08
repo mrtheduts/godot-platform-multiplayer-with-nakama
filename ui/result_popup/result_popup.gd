@@ -1,8 +1,11 @@
 extends ConfirmationDialog
 
+class_name ResultPopup
+
 signal restarted_game
 
 
+# Called when the node enters the scene tree for the first time.
 func _ready():
 	popup_exclusive = true
 	get_close_button().visible = false
@@ -19,6 +22,10 @@ func show_win() -> void:
 
 func show_lose() -> void:
 	dialog_text = "You Lost!"
+	popup_centered()
+
+func show_tie() -> void:
+	dialog_text = "You tied!"
 	popup_centered()
 
 

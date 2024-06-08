@@ -2,20 +2,20 @@ extends Label
 
 class_name Score
 
-var _score := 0
+var score := 0
 
 
+# Called when the node enters the scene tree for the first time.
 func _ready():
 	_update()
 
 
+# Increases score
 func increase() -> void:
-	_score += 1
+	score += 1
 	_update()
 
-func reset() -> void:
-	_score = 0
-	_update()
 
+# Updates label text to match current score
 func _update() -> void:
-	text = String(_score)
+	text = String(score)
