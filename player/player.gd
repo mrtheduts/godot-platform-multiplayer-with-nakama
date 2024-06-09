@@ -245,6 +245,12 @@ func _unhandled_input(event):
 		_input_map["shoot"] = event.pressed
 	if event is InputEventMouseMotion:
 		_on_mouse_pos_updated(get_global_mouse_position())
+	
+	rpc("update_remote_input", _input_map)
+
+
+remote func update_remote_input(input_map: Dictionary) -> void:
+	_input_map = input_map
 
 
 # Updates target to match mouse's position.

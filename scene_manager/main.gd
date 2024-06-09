@@ -80,7 +80,7 @@ remote func _spawn_player(player_id: String, is_local_player: bool, init_pos: Ve
 	print("Player ID: %s" % player_id)
 	var spawner: SpawnPoints = _curr_arena.get_node("SpawnPoints")
 	var player = spawner.spawn_player(player_id, is_local_player)
-	player.connect("died", self, "_spawn_player")
+#	player.connect("died", self, "_spawn_player")
 	player.connect("died", self, "_increase_score")
 	
 	if not is_local_player:
