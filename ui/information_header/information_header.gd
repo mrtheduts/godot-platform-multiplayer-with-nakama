@@ -11,7 +11,11 @@ onready var _score_enemy: Score = $HBoxContainer/ScoreEnemy
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$PlayerNames/PlayerName.text = ConnectionManager.user_id
+	ConnectionManager.connect("player_joined", self, "_on_enemy_joined")
 
+
+func _on_enemy_joined(player: ConnectionManager.ConnectionPlayer) -> void:
+	set_enemy_name(player.get_clean_username())
 
 # Sets enemy's name
 func set_enemy_name(name: String) -> void:
@@ -39,3 +43,8 @@ func _on_Timer_completed():
 # > 0: Won
 func has_player_won() -> int:
 	return _score.score - _score_enemy.score
+
+
+# Stops timer
+func stop_timer() -> void:
+	$HBoxContainer/Timer.stop_timer()

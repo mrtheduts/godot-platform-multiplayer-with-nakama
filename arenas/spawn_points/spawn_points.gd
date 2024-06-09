@@ -6,7 +6,7 @@ var PLAYER_SCENE = load("res://player/player.tscn")
 
 # Spawns player at random point, which are the location of its children
 # @ is_player: true if this player should listen to the user inputs
-func spawn_player(is_local_player: bool = false) -> Player:
+func spawn_player(player_id: String, is_local_player: bool = false) -> Player:
 	var spots: Array = get_children()
 	
 	# Spawner has no children to serve as position sources
@@ -21,4 +21,5 @@ func spawn_player(is_local_player: bool = false) -> Player:
 	
 	get_parent().add_child(new_player)
 	new_player.position = position
+	new_player.name = player_id
 	return new_player

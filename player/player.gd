@@ -178,7 +178,7 @@ func _detect_target_hit() -> void:
 	if $Hand/RayCast2D.is_colliding():
 		var target = $Hand/RayCast2D.get_collider() as Player
 		if target != null:
-			target.get_hit()
+			target.rpc("get_hit")
 			_change_face_to("happy_angry")
 	# Hit missed
 	else:
@@ -193,7 +193,7 @@ func _detect_target_hit() -> void:
 
 # Dies on hit.
 # Called by enemy object
-func get_hit() -> void:
+remotesync func get_hit() -> void:
 	$Body/Face.texture = FACE_TEXTURES["dead"]
 	$Body/HitParticle.emitting = true
 	# Dying fade out
@@ -208,7 +208,7 @@ func _change_face_to(name: String) -> void:
 
 
 # Removes player object
-func _die() -> void:
+remotesync func _die() -> void:
 	emit_signal("died", is_local_player)
 	queue_free()
 

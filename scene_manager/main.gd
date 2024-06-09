@@ -12,9 +12,13 @@ onready var _result_popup: ResultPopup = $CanvasLayer/ResultPopup
 
 var _information_header: InformationHeader = null
 var _curr_arena: Node2D = null
+var _local_player: Player = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	ConnectionManager.connect("player_left", self, "_on_player_left")
+	ConnectionManager.connect("matched", self, "_on_connection_matched")
+	ConnectionManager.connect("player_joined", self, "_on_player_joined")
 	_start_user_info_input()
 
 
@@ -28,13 +32,27 @@ func _start_user_info_input() -> void:
 func _on_SessionWindow_auth_completed():
 	_create_information_header()
 	ConnectionManager.assign_match()
-	
-	# Waits for matchmaking success
-	yield(ConnectionManager, "matched")
-	
+
+
+func _on_connection_matched(player_id: int) -> void:
 	_session_window.hide()
 	_canvas_layer.add_child(_information_header)
-	_start_game()
+	_setup_game()
+	_local_player = _spawn_player(str(player_id), true)
+	
+	get_tree().set_pause(true)
+
+
+func _on_player_joined(player: ConnectionManager.ConnectionPlayer) -> void:
+	var peer_id := player.peer_id
+	var my_peer_id := get_tree().get_network_unique_id()
+	print("--- Peer ID: %s" % str(peer_id))
+	
+	rpc_id(peer_id, "_spawn_player", str(my_peer_id), false, _local_player.position)
+
+
+remotesync func _game_start() -> void:
+	get_tree().set_pause(false)
 
 
 # Creates UI for scores and timer
@@ -51,20 +69,26 @@ func _remove_information_header() -> void:
 
 
 # Creates an arena and adds to scene
-func _start_game() -> void:
+func _setup_game() -> void:
 	Input.set_custom_mouse_cursor(CUSTOM_CURSOR_TARGET)
-	_stop_game()
 	_curr_arena = FOREST_ARENA_SCENE.instance()
 	add_child(_curr_arena)
-	_spawn_player(true)
 
 
 # Spawns player at random positions
-func _spawn_player(is_local_player: bool) -> void:
+remote func _spawn_player(player_id: String, is_local_player: bool, init_pos: Vector2 = Vector2.ZERO) -> Player:
+	print("Player ID: %s" % player_id)
 	var spawner: SpawnPoints = _curr_arena.get_node("SpawnPoints")
-	var player = spawner.spawn_player(true)
+	var player = spawner.spawn_player(player_id, is_local_player)
 	player.connect("died", self, "_spawn_player")
 	player.connect("died", self, "_increase_score")
+	
+	if not is_local_player:
+		player.position = init_pos
+		rpc('_game_start')
+		
+	
+	return player
 
 
 # Increases score
@@ -82,13 +106,21 @@ func _stop_game() -> void:
 		_curr_arena = null
 
 
+func _on_player_left() -> void:
+	_information_header.stop_timer()
+	_on_timer_completed(true)
+
 # Shows result popup.
 # Callback on match timer completed.
-func _on_timer_completed() -> void:
+func _on_timer_completed(player_left: bool = false) -> void:
 	Input.set_custom_mouse_cursor(CUSTOM_CURSOR_NORMAL)
 	var tween := get_tree().create_tween()
 	tween.tween_property(_curr_arena, "modulate", Color.transparent, 0.5)
 	tween.tween_callback(self, "_stop_game")
+	
+	if player_left:
+		_result_popup.show_win()
+		return
 	
 	var result := _information_header.has_player_won()
 	if result < 0:
@@ -102,4 +134,5 @@ func _on_timer_completed() -> void:
 # Restarts game.
 # Callback on ResultPopup confirmation
 func _on_ResultPopup_restarted_game():
-	_start_game()
+	_stop_game()
+	_setup_game()
