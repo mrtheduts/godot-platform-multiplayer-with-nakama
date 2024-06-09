@@ -4,6 +4,9 @@ class_name Player
 
 signal died
 
+onready var RED_BODY: Texture = load("res://player/shapes/red_body_square.png")
+onready var RED_HAND: Texture = load("res://player/shapes/red_hand_point.png")
+
 onready var BULLET_TEXTURE: Texture = load("res://player/particles/trace_01.png")
 
 onready var FACE_TEXTURES: Dictionary = {
@@ -56,6 +59,9 @@ var _is_on_shot_cooldown := false
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize() # Init RNG for muzzle randomization
+	if not is_local_player:
+		$Body.texture = RED_BODY
+		$Hand.texture = RED_HAND
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -236,8 +242,7 @@ func _unhandled_input(event):
 		elif event.scancode == KEY_S:
 			_input_map["fall"] = event.pressed
 	if event is InputEventMouseButton:
-		if event.button_index == 1:
-			_input_map["shoot"] = event.pressed
+		_input_map["shoot"] = event.pressed
 	if event is InputEventMouseMotion:
 		_on_mouse_pos_updated(get_global_mouse_position())
 

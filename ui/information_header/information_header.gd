@@ -1,11 +1,21 @@
-extends HBoxContainer
+extends VBoxContainer
 
 class_name InformationHeader
 
 signal timer_completed
 
-onready var _score: Score = $Score
-onready var _score_enemy: Score = $ScoreEnemy
+onready var _score: Score = $HBoxContainer/Score
+onready var _score_enemy: Score = $HBoxContainer/ScoreEnemy
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	$PlayerNames/PlayerName.text = ConnectionManager.user_id
+
+
+# Sets enemy's name
+func set_enemy_name(name: String) -> void:
+	$PlayerNames/EnemyName.text = name
 
 
 # Increases local player score

@@ -2,9 +2,11 @@ extends PopupDialog
 
 signal auth_completed
 
-const MIN_LENGHT := 10
+const MAX_LENGHT := 15
+const MIN_LENGHT := 3
 
-const ERROR_MIN_LENGTH := "Username should have at least 10 characters!"
+const ERROR_MAX_LENGTH := "Username should have at most 15 characters!"
+const ERROR_MIN_LENGTH := "Username should have at lest 3 characters!"
 
 onready var _line_edit: LineEdit = $CenterContainer/VBoxContainer/HBoxContainer/LineEdit
 onready var _error_label: Label = $CenterContainer/VBoxContainer/ErrorLabel
@@ -35,7 +37,7 @@ func _on_LineEdit_text_entered(new_text):
 
 # Checks if current username value is valid
 func _is_username_valid() -> bool:
-	return _username.length() >= MIN_LENGHT
+	return _username.length() <= MAX_LENGHT and _username.length() >= MIN_LENGHT
 
 
 # Callback for button pressed. Also shows error when username is not valid.
@@ -56,7 +58,10 @@ func _on_Button_pressed() -> void:
 
 # Shows apropriate error message
 func _show_error() -> void:
-	_error_label.text = ERROR_MIN_LENGTH
+	if _username.length() > MAX_LENGHT:
+		_error_label.text = ERROR_MAX_LENGTH
+	else:
+		_error_label.text = ERROR_MIN_LENGTH
 	_error_label.visible = true
 
 

@@ -56,6 +56,23 @@ func _start_game() -> void:
 	_stop_game()
 	_curr_arena = FOREST_ARENA_SCENE.instance()
 	add_child(_curr_arena)
+	_spawn_player(true)
+
+
+# Spawns player at random positions
+func _spawn_player(is_local_player: bool) -> void:
+	var spawner: SpawnPoints = _curr_arena.get_node("SpawnPoints")
+	var player = spawner.spawn_player(true)
+	player.connect("died", self, "_spawn_player")
+	player.connect("died", self, "_increase_score")
+
+
+# Increases score
+func _increase_score(is_local_player: bool) -> void:
+	if not is_local_player:
+		_information_header.increase_score()
+	else:
+		_information_header.increase_score_enemy()
 
 
 # Removes the current arena

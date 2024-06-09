@@ -40,7 +40,6 @@ texture = ExtResource( 3 )
 [node name="RayCast2D" type="RayCast2D" parent="Hand"]
 position = Vector2( -0.185841, -4.99655 )
 rotation = 4.03171
-scale = Vector2( 1, 1 )
 cast_to = Vector2( 0, 5000 )
 collision_mask = 2
 
