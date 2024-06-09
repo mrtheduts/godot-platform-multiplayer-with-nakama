@@ -14,6 +14,16 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://ui/information_header/information_header.gd"
 }, {
+"base": "Reference",
+"class": "Instance",
+"language": "GDScript",
+"path": "res://addons/minstance/Instance.gd"
+}, {
+"base": "Object",
+"class": "MinstanceRemote",
+"language": "GDScript",
+"path": "res://addons/minstance/MinstanceRemote.gd"
+}, {
 "base": "Label",
 "class": "MyTimer",
 "language": "GDScript",
@@ -116,6 +126,8 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "InformationHeader": "",
+"Instance": "",
+"MinstanceRemote": "",
 "MyTimer": "",
 "NakamaAPI": "",
 "NakamaAsyncResult": "",
@@ -154,6 +166,10 @@ ConnectionManager="*res://singletons/connection_manager.gd"
 window/size/width=920
 window/size/height=920
 window/size/resizable=false
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/minstance/plugin.cfg" )
 
 [gui]
 

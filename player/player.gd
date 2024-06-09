@@ -69,6 +69,8 @@ func _process(delta):
 	if _shot_time >= SHOT_DURATION:
 		_stop_shooting()
 		_is_on_shot_cooldown = true
+	elif _is_shooting:
+		_shot_time += delta
 	
 	# Increases cooldown time, and resets after it ends
 	if _is_on_shot_cooldown:
@@ -82,7 +84,6 @@ func _process(delta):
 func _physics_process(delta):
 	# While shot lasts, it detects if enemy is hit
 	if _is_shooting:
-		_shot_time += delta
 		_detect_target_hit()
 	
 	# Horizontal Movement
@@ -247,8 +248,8 @@ func _on_mouse_pos_updated(new_global_pos: Vector2) -> void:
 	if not is_local_player or _is_shooting:
 		return
 	
-	var dir_to := position.direction_to(new_global_pos)
-	var hand_pos: Vector2 = dir_to * 70
+	var dir_to := position.direction_to(new_global_pos + Vector2(42, 42)) # Custom target cursor offset
+	var hand_pos: Vector2 = dir_to * 70 # distance from center
 	$Hand.position = hand_pos
 	
 	var offset_angle = 39 # fixed starting rotation in degrees

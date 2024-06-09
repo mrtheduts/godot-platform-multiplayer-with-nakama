@@ -3,11 +3,10 @@
 [ext_resource path="res://ui/result_popup/result_popup.gd" type="Script" id=1]
 
 [node name="ResultPopup" type="ConfirmationDialog"]
-visible = true
 margin_right = 200.0
 margin_bottom = 70.0
-window_title = "Confirme Por Favor..."
-dialog_hide_on_ok = false
+window_title = ""
+dialog_text = "Placeholder"
 script = ExtResource( 1 )
 
 [connection signal="confirmed" from="." to="." method="_on_ConfirmationDialog_confirmed"]

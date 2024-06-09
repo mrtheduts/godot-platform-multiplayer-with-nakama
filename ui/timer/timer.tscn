@@ -6,4 +6,5 @@
 margin_right = 40.0
 margin_bottom = 14.0
 text = "0"
+align = 1
 script = ExtResource( 1 )

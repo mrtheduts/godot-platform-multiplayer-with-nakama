@@ -1,5 +1,8 @@
 extends Node
 
+var CUSTOM_CURSOR_NORMAL = preload("res://cursors/hand_point.png")
+var CUSTOM_CURSOR_TARGET = preload("res://cursors/target.png")
+
 var INFORMATION_HEADER_SCENE: PackedScene = preload("res://ui/information_header/information_header.tscn")
 var FOREST_ARENA_SCENE: PackedScene = preload("res://arenas/forest.tscn")
 
@@ -17,6 +20,7 @@ func _ready():
 
 # Pops up window for username input and connection button
 func _start_user_info_input() -> void:
+	Input.set_custom_mouse_cursor(CUSTOM_CURSOR_NORMAL)
 	_session_window.popup_centered_minsize()
 
 
@@ -48,6 +52,7 @@ func _remove_information_header() -> void:
 
 # Creates an arena and adds to scene
 func _start_game() -> void:
+	Input.set_custom_mouse_cursor(CUSTOM_CURSOR_TARGET)
 	_stop_game()
 	_curr_arena = FOREST_ARENA_SCENE.instance()
 	add_child(_curr_arena)
@@ -63,6 +68,7 @@ func _stop_game() -> void:
 # Shows result popup.
 # Callback on match timer completed.
 func _on_timer_completed() -> void:
+	Input.set_custom_mouse_cursor(CUSTOM_CURSOR_NORMAL)
 	var tween := get_tree().create_tween()
 	tween.tween_property(_curr_arena, "modulate", Color.transparent, 0.5)
 	tween.tween_callback(self, "_stop_game")
