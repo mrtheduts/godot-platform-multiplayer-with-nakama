@@ -75,17 +75,23 @@ func _setup_game() -> void:
 	add_child(_curr_arena)
 
 
+func _respawn_player(player_id: String, is_local_player: bool) -> void:
+	if not is_local_player:
+		return
+	
+	var player := _spawn_player(player_id, is_local_player)
+	rpc("_spawn_player", player_id, false, player.position)
+
 # Spawns player at random positions
 remote func _spawn_player(player_id: String, is_local_player: bool, init_pos: Vector2 = Vector2.ZERO) -> Player:
 	var spawner: SpawnPoints = _curr_arena.get_node("SpawnPoints")
 	var player = spawner.spawn_player(player_id, is_local_player)
-	player.connect("died", self, "_spawn_player")
+	player.connect("died", self, "_respawn_player")
 	player.connect("died", self, "_increase_score")
 	
 	if not is_local_player:
 		player.position = init_pos
 		rpc('_game_start')
-		
 	
 	return player
 
