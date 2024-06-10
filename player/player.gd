@@ -69,12 +69,12 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	# If player is not shooting or is on cooldown, it is able to input a shot
-	if _input_map["shoot"] and not _is_shooting and not _is_on_shot_cooldown:
+	if _input_map["shoot"] and not _is_shooting and not _is_on_shot_cooldown and is_local_player:
 		rpc("_start_shooting")
 	
 	# The shot will last a while to enable collision detection.
 	# If duration ends, it enters cooldown time
-	if _shot_time >= SHOT_DURATION:
+	if _shot_time >= SHOT_DURATION and is_local_player:
 		rpc("_stop_shooting")
 		_is_on_shot_cooldown = true
 	elif _is_shooting:
@@ -224,8 +224,7 @@ func _change_face_to(name: String) -> void:
 
 # Removes player object
 func _die() -> void:
-	emit_signal("died", name, is_local_player)
-	queue_free()
+	emit_signal("died", self, name, is_local_player)
 
 
 # Removes bullet.

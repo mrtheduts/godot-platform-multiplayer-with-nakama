@@ -14,6 +14,8 @@ var _information_header: InformationHeader = null
 var _curr_arena: Node2D = null
 var _local_player: Player = null
 
+var _curr_players: Dictionary = {}
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	ConnectionManager.connect("player_left", self, "_on_player_left")
@@ -46,7 +48,6 @@ func _on_connection_matched(player_id: int) -> void:
 func _on_player_joined(player: ConnectionManager.ConnectionPlayer) -> void:
 	var peer_id := player.peer_id
 	var my_peer_id := get_tree().get_network_unique_id()
-	print("--- Peer ID: %s" % str(peer_id))
 	
 	rpc_id(peer_id, "_spawn_player", str(my_peer_id), false, _local_player.position)
 
@@ -75,15 +76,22 @@ func _setup_game() -> void:
 	add_child(_curr_arena)
 
 
-func _respawn_player(player_id: String, is_local_player: bool) -> void:
+func _respawn_player(dead_player: Player, player_id: String, is_local_player: bool) -> void:
+	_curr_players.erase(is_local_player)
+	dead_player.name = "dead"
+	dead_player.queue_free()
 	if not is_local_player:
 		return
 	
 	var player := _spawn_player(player_id, is_local_player)
-	rpc("_spawn_player", player_id, false, player.position)
+	if is_local_player:
+		rpc("_spawn_player", player_id, false, player.position)
 
 # Spawns player at random positions
 remote func _spawn_player(player_id: String, is_local_player: bool, init_pos: Vector2 = Vector2.ZERO) -> Player:
+	if _curr_players.has(is_local_player):
+		return _curr_players[is_local_player]
+	
 	var spawner: SpawnPoints = _curr_arena.get_node("SpawnPoints")
 	var player = spawner.spawn_player(player_id, is_local_player)
 	player.connect("died", self, "_respawn_player")
@@ -93,11 +101,12 @@ remote func _spawn_player(player_id: String, is_local_player: bool, init_pos: Ve
 		player.position = init_pos
 		rpc('_game_start')
 	
+	_curr_players[is_local_player] = player
 	return player
 
 
 # Increases score
-func _increase_score(_name, is_local_player: bool) -> void:
+func _increase_score(_dead_player, _name, is_local_player: bool) -> void:
 	if not is_local_player:
 		_information_header.increase_score()
 	else:
@@ -139,7 +148,6 @@ func _on_timer_completed(player_left: bool = false) -> void:
 # Restarts game.
 # Callback on ResultPopup confirmation
 func _on_ResultPopup_restarted_game():
-	print("Restarting")
 	_reset_everything()
 	_start_user_info_input()
 
@@ -147,3 +155,4 @@ func _reset_everything() -> void:
 	ConnectionManager.end_connection()
 	_remove_information_header()
 	_session_window.reset()
+	_curr_players.clear()

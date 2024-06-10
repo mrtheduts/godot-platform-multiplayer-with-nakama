@@ -112,7 +112,6 @@ func _on_matchmaker_matched() -> void:
 
 
 func _on_network_peer_connected(peer_id: int) -> void:
-	print("Peer connected: %s" % str(peer_id))
 	var presence: NakamaRTAPI.UserPresence = _bridge.get_user_presence_for_peer(peer_id)
 	var player = ConnectionPlayer.from_presence(presence, peer_id)
 	_players[peer_id] = player
