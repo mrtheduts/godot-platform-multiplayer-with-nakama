@@ -55,6 +55,8 @@ var _shot_time := 0.0
 var _shot_cooldown_time := 0.0
 var _is_on_shot_cooldown := false
 
+const UPDATE_POS_TIME := 0.20
+var _update_pos_counter := 0.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -68,12 +70,12 @@ func _ready():
 func _process(delta):
 	# If player is not shooting or is on cooldown, it is able to input a shot
 	if _input_map["shoot"] and not _is_shooting and not _is_on_shot_cooldown:
-		_start_shooting()
+		rpc("_start_shooting")
 	
 	# The shot will last a while to enable collision detection.
 	# If duration ends, it enters cooldown time
 	if _shot_time >= SHOT_DURATION:
-		_stop_shooting()
+		rpc("_stop_shooting")
 		_is_on_shot_cooldown = true
 	elif _is_shooting:
 		_shot_time += delta
@@ -125,10 +127,23 @@ func _physics_process(delta):
 			_change_face_to("normal")
 		_velocity.y = 0
 		_is_jumping = false
+	
+	# Update remote position for correction
+	if is_local_player:
+		_update_pos_counter += delta
+		if _update_pos_counter >= UPDATE_POS_TIME:
+			_update_pos_counter = 0.0
+			rpc_unreliable("update_remote_position", position)
+
+
+# Checks if remote connection has to be corrected
+remote func update_remote_position(pos: Vector2) -> void:
+	if abs(position.x - pos.x) >= 50 or abs(position.y - pos.y) >= 50:
+		position = pos
 
 
 # Creates shooting visual effects and starts raycast detection
-func _start_shooting() -> void:
+remotesync func _start_shooting() -> void:
 	_is_shooting = true
 	$Hand/RayCast2D.enabled = true
 	_shot_time = 0.0
@@ -178,7 +193,7 @@ func _detect_target_hit() -> void:
 	if $Hand/RayCast2D.is_colliding():
 		var target = $Hand/RayCast2D.get_collider() as Player
 		if target != null:
-			target.rpc("get_hit")
+			target.get_hit()
 			_change_face_to("happy_angry")
 	# Hit missed
 	else:
@@ -193,7 +208,7 @@ func _detect_target_hit() -> void:
 
 # Dies on hit.
 # Called by enemy object
-remotesync func get_hit() -> void:
+func get_hit() -> void:
 	$Body/Face.texture = FACE_TEXTURES["dead"]
 	$Body/HitParticle.emitting = true
 	# Dying fade out
@@ -208,8 +223,8 @@ func _change_face_to(name: String) -> void:
 
 
 # Removes player object
-remotesync func _die() -> void:
-	emit_signal("died", is_local_player)
+func _die() -> void:
+	emit_signal("died", name, is_local_player)
 	queue_free()
 
 
@@ -221,7 +236,7 @@ func _free_bullet(bullet: Node2D) -> void:
 
 
 # Finishes shooting detection and effects
-func _stop_shooting() -> void:
+remotesync func _stop_shooting() -> void:
 	_is_shooting = false
 	$Hand/RayCast2D.enabled = false
 	$Hand/Light2D.enabled = false
@@ -241,12 +256,12 @@ func _unhandled_input(event):
 			_input_map["jump"] = event.pressed
 		elif event.scancode == KEY_S:
 			_input_map["fall"] = event.pressed
+		rpc("update_remote_input", _input_map)
 	if event is InputEventMouseButton:
 		_input_map["shoot"] = event.pressed
 	if event is InputEventMouseMotion:
 		_on_mouse_pos_updated(get_global_mouse_position())
 	
-	rpc("update_remote_input", _input_map)
 
 
 remote func update_remote_input(input_map: Dictionary) -> void:
@@ -261,7 +276,7 @@ func _on_mouse_pos_updated(new_global_pos: Vector2) -> void:
 	
 	var dir_to := position.direction_to(new_global_pos + Vector2(42, 42)) # Custom target cursor offset
 	var hand_pos: Vector2 = dir_to * 70 # distance from center
-	$Hand.position = hand_pos
+	rpc_unreliable("update_hand_pos", hand_pos)
 	
 	var offset_angle = 39 # fixed starting rotation in degrees
 	if hand_pos.x < 0:
@@ -272,4 +287,16 @@ func _on_mouse_pos_updated(new_global_pos: Vector2) -> void:
 		$Hand.scale.x = 1
 	
 	var hand_angle = dir_to.angle() + deg2rad(offset_angle)
+	
 	$Hand.rotation = hand_angle
+	rpc_unreliable("update_hand_rot", hand_angle, hand_pos.x < 0)
+
+remotesync func update_hand_pos(pos: Vector2) -> void:
+	$Hand.position = pos
+
+remote func update_hand_rot(rot: float, should_add_mirror: bool) -> void:
+	$Hand.rotation = rot
+	if should_add_mirror:
+		$Hand.scale.x = -1
+	else:
+		$Hand.scale.x = 1

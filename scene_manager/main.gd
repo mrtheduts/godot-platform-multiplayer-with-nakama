@@ -77,10 +77,9 @@ func _setup_game() -> void:
 
 # Spawns player at random positions
 remote func _spawn_player(player_id: String, is_local_player: bool, init_pos: Vector2 = Vector2.ZERO) -> Player:
-	print("Player ID: %s" % player_id)
 	var spawner: SpawnPoints = _curr_arena.get_node("SpawnPoints")
 	var player = spawner.spawn_player(player_id, is_local_player)
-#	player.connect("died", self, "_spawn_player")
+	player.connect("died", self, "_spawn_player")
 	player.connect("died", self, "_increase_score")
 	
 	if not is_local_player:
@@ -92,7 +91,7 @@ remote func _spawn_player(player_id: String, is_local_player: bool, init_pos: Ve
 
 
 # Increases score
-func _increase_score(is_local_player: bool) -> void:
+func _increase_score(_name, is_local_player: bool) -> void:
 	if not is_local_player:
 		_information_header.increase_score()
 	else:

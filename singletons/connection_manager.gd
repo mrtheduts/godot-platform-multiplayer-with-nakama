@@ -63,9 +63,7 @@ func _ready():
 	randomize()
 	get_tree().connect("network_peer_connected", self, "_on_network_peer_connected")
 	get_tree().connect("network_peer_disconnected", self, "_on_network_peer_disconnected")
-	
-	_client = Nakama.create_client(SERVER_KEY, HOST, PORT, SCHEME)
-	_client.timeout = 30 # seconds
+	_client = Nakama.create_client(SERVER_KEY, HOST, PORT, SCHEME, 30, NakamaLogger.LOG_LEVEL.ERROR)
 
 
 # Creates a Nakama Session and a Socket for given user
