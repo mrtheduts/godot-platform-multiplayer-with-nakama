@@ -139,5 +139,11 @@ func _on_timer_completed(player_left: bool = false) -> void:
 # Restarts game.
 # Callback on ResultPopup confirmation
 func _on_ResultPopup_restarted_game():
-	_stop_game()
-	_setup_game()
+	print("Restarting")
+	_reset_everything()
+	_start_user_info_input()
+
+func _reset_everything() -> void:
+	ConnectionManager.end_connection()
+	_remove_information_header()
+	_session_window.reset()

@@ -89,6 +89,10 @@ func authenticate(username: String) -> int:
 	get_tree().network_peer = _bridge.multiplayer_peer
 	return 0
 
+func end_connection() -> void:
+	_session = null
+	_socket = null
+	_bridge = null
 
 # Assigns a match to current socket
 func assign_match() -> void:

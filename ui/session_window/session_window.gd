@@ -68,3 +68,10 @@ func _show_error() -> void:
 # Hides error message
 func _hide_error() -> void:
 	_error_label.visible = false
+
+
+func reset() -> void:
+	_button.disabled = false
+	_button.visible = true
+	_hide_error()
+	_connecting_label.visible = false
