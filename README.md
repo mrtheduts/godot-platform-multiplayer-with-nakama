@@ -1,4 +1,6 @@
-# Potential Octo Tribble
+# Godot Platform Multiplayer with Nakama
+
+![screenshot of current status](godot_multiplayer.gif)
 
 ## Required Software
 * Godot 3.X (https://godotengine.org/download/3.x)
@@ -12,4 +14,3 @@
 ## How to export to web
 Change `singletons/connection_manager.gd` to reflect final nakama server address and port
 Check https://docs.godotengine.org/pt-br/3.x/tutorials/export/exporting_for_web.html
-
